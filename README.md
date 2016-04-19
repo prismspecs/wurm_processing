@@ -25,10 +25,11 @@ OSC Emulator emulates the signals that normally come from the WURM audio engine 
 Written in [Processing](http://processing.org) the engine uses Syphon to send the video output into VDMX, and uses OSC to transmit and receive messages. To set up:
 
 1. Find this section of text:
-
-`String PETER_IP = "169.254.128.132";
+```
+String PETER_IP = "169.254.128.132";
 String BASE_IP = "169.254.208.46";
-String VDMX_IP = "127.0.0.1"; // (localhost)`
+String VDMX_IP = "127.0.0.1"; // (localhost)
+```
 
 2. Change PETER_IP to the IP address of the computer running Pure Data (if same computer, use 127.0.0.1)
 3. Change BASE_IP to the IP address of the computer running Houston
