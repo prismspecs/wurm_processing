@@ -8,23 +8,26 @@ void checkScene() {
       OscMessage m = new OscMessage("/pilot/scene");
       m.add(scene);
       oscP5.send(m, PETER);
-
-      // only send scene changes to monica if we are over scene 3
-      // since she controls the first ones via Houston
-      if (scene > 3 || scene == 0)
-        oscP5.send(m, BASE);
     }
 
-    removeAll();  // remove all stellar objects
+
+    // remove any old waves here...
+    for(int i = waves.size() - 1; i >= 0; i--) {
+      waves.remove(i);
+    }
+    // and particles
+    for(int i = particles.size() - 1; i >= 0; i--) {
+      particles.remove(i);
+    }
     resetVDMX();  // reset VDMX every scene change
 
     // erase canvases
-    pg.beginDraw();
-    pg.background(0);
-    pg.endDraw();
-    pgD.beginDraw();
-    pgD.background(0);
-    pgD.endDraw();
+    pilot.beginDraw();
+    pilot.background(0);
+    pilot.endDraw();
+    diagnostics.beginDraw();
+    diagnostics.background(0);
+    diagnostics.endDraw();
 
     // reset difficulty selection
     whichDiff = 0;
@@ -79,20 +82,6 @@ void checkScene() {
       eventReady[1] = true;
       eventReady[2] = true;
       eventReady[3] = true;
-    }
-  }
-}
-
-void removeAll() {
-  // remove old asteroids and streaks, etc.
-  synchronized (streaks) {
-    for (int i = 0; i < streaks.size(); i++) {
-      streaks.remove(i);
-    }
-  }
-  synchronized (asteroids) {
-    for (int i = 0; i < asteroids.size(); i++) {
-      asteroids.remove(i);
     }
   }
 }

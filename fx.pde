@@ -5,6 +5,6 @@ color strobeColor = color(255,0,0);
 
 void doStrobe() {
 	if (frameCount % strobeRate == 0) {
-		pg.background(strobeColor, strobeTrans);
+		pilot.background(strobeColor, strobeTrans);
 	}
 }

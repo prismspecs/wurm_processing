@@ -23,18 +23,18 @@ class Star {
 		shift = sin(p) * 4;	// pulsate star
 
 		// draw star
-		pg.pushMatrix();
-		pg.translate(pos.x, pos.y, pos.z);
+		pilot.pushMatrix();
+		pilot.translate(pos.x, pos.y, pos.z);
 
 		// corona
-		pg.noFill();
-		pg.stroke(c);
-		pg.strokeWeight(1);
-		pg.ellipse(0, 0, s + shift * 2, s + shift * 2);
+		pilot.noFill();
+		pilot.stroke(c);
+		pilot.strokeWeight(1);
+		pilot.ellipse(0, 0, s + shift * 2, s + shift * 2);
 
-		pg.fill(c);
-		pg.ellipse(0, 0, s + shift, s + shift);
+		pilot.fill(c);
+		pilot.ellipse(0, 0, s + shift, s + shift);
 		
-		pg.popMatrix();
+		pilot.popMatrix();
 	}
 }

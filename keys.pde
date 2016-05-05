@@ -13,54 +13,46 @@ void keyReleased() {
 
   int addCount = 10;
 
-  // ADD STUFF
   if (scene == 5) {
-    if (key == 'q') {
-      //println("adding asteroid");
-      for (int i = 0; i < addCount; i++) {
-        asteroids.add(new Asteroid(0));
-      }
-    }
-    if (key == 'w' ) {
-      for (int i = 0; i < addCount; i++) {
-        asteroids.add(new Asteroid(1));
-      }
-    }
-    if (key == 'e' ) {
-      for (int i = 0; i < addCount; i++) {
-        asteroids.add(new Asteroid(2)); // line monster
-      }
-    }
-    if (key == 'r' ) {
-      for (int i = 0; i < addCount; i++) {
-        asteroids.add(new Asteroid(3)); // triangle
-      }
-    }
-    if (key == 't' ) {
-      for (int i = 0; i < addCount; i++) {
-        asteroids.add(new Asteroid(4)); // streak
-      }
-    }
-    if (key == 'y' ) {
-      for (int i = 0; i < addCount; i++) {
-        asteroids.add(new Asteroid(5)); // corkscrew thing
-      }
-    }
-    if (key == 'u' ) {
-      for (int i = 0; i < addCount; i++) {
-        asteroids.add(new Asteroid(6));
-      }
-    }
-    if (key == 'i' ) {
-      for (int i = 0; i < addCount; i++) {
-        asteroids.add(new Asteroid(7));
-      }
-    }
+
   }
 }
 
 void keyPressed() {
-  // diagnostic keys for changing oxygen, etc. values
+  // keys from makey makey (Houston)
+  // w,s,f,g
+  // down, up, right, left
+  if (key == CODED) {
+    if (keyCode == DOWN) {
+      houston.patcherRightTouched = 0;
+    }
+    if (keyCode == UP) {
+      houston.patcherRightTouched = 1;
+    }
+    if (keyCode == RIGHT) {
+      houston.patcherRightTouched = 2;
+    }
+    if (keyCode == LEFT) {
+      houston.patcherRightTouched = 3;
+    }
+  }
+
+  if (key == 'w') {
+    houston.patcherLeftTouched = 0;
+  }
+  if (key == 's') {
+    houston.patcherLeftTouched = 1;
+  }
+  if (key == 'f') {
+    houston.patcherLeftTouched = 2;
+  }
+  if (key == 'g') {
+    houston.patcherLeftTouched = 3;
+  }
+
+
+  // ------ diagnostic keys for changing w/o Arduino -----
+  // hyperdrive
   if (key == '[') {
     actual[0] -= 5;
     actual[0] = constrain(actual[0], 0, range);
@@ -69,7 +61,7 @@ void keyPressed() {
     actual[0] += 5;
     actual[0] = constrain(actual[0], 0, range);
   }
-
+  // oxygen
   if (key == ';') {
     actual[1] -= 5;
     actual[1] = constrain(actual[1], 0, range);
@@ -78,7 +70,7 @@ void keyPressed() {
     actual[1] += 5;
     actual[1] = constrain(actual[1], 0, range);
   }
-
+  // modulation
   if (key == ',') {
     actual[2] -= 5;
     actual[2] = constrain(actual[2], 0, range);
@@ -88,7 +80,7 @@ void keyPressed() {
     actual[2] = constrain(actual[2], 0, range);
   }
 
-// switches
+  // switches
   if (key == 'z') {
     if (actualSwitches.charAt(0) == '0') {
       actualSwitches = "1" + actualSwitches.charAt(1) + actualSwitches.charAt(2);
@@ -108,21 +100,6 @@ void keyPressed() {
       actualSwitches = "" + actualSwitches.charAt(0) + actualSwitches.charAt(1) + "1";
     } else {
       actualSwitches = "" + actualSwitches.charAt(0) + actualSwitches.charAt(1) + "0";
-    }
-  }
-
-  // add crack ... ?
-  if (key == 'v') {
-    cracks.add(new Crack());
-  }
-
-  // DIFFICULTY OPTIONs
-  if (key == CODED) {
-    if (keyCode == DOWN) {
-      whichDiff++;
-    }
-    if (keyCode == UP) {
-      whichDiff--;
     }
   }
 }

@@ -1,15 +1,15 @@
 int emergencyTime = 5 * 1000;
 
 void emergency() {
-	pg.beginDraw();
-	pg.background(0);
+	pilot.beginDraw();
+	pilot.background(0);
 
 	// there are stars from last scene, animate those suckers
 	for (Star s : stars) {
 		s.display();
 	}
 
-	pg.endDraw();
+	pilot.endDraw();
 
 	strobe = true;
 	strobeTrans = 127;

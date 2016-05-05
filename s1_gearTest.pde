@@ -38,85 +38,84 @@ void setupHUD() {
 	hudSwitchFill = color(255);
 
 	// font
-	hudFontSize = 40;
-	hudTextBuffer = hudFontSize + 4;
+	hudTextBuffer = font_small_size + 4;
 }
 
 void gearTest() {
 
-	pgD.beginDraw();
-	pgD.background(0);
+	diagnostics.beginDraw();
+	diagnostics.background(0);
 
 	// draw pilot HUD
 
 	// text
-	pgD.textFont(fontGUI, hudFontSize);
-	pgD.fill(hudFontColor);
-	pgD.textAlign(LEFT);
-	pgD.text("HYPERDRIVE POWER", beginX, vertSpacing * 1 - hudTextBuffer);
-	pgD.text("OXYGEN FLOW", beginX, vertSpacing * 2 - hudTextBuffer);
-	pgD.text("GRAVITY MODULATION", beginX, vertSpacing * 3 - hudTextBuffer);
-	pgD.text("PARTICLE SPLITTER", beginX, vertSpacing * 4 - hudTextBuffer);
+	diagnostics.textFont(font_small, font_small_size);
+	diagnostics.fill(hudFontColor);
+	diagnostics.textAlign(LEFT);
+	diagnostics.text("HYPERDRIVE POWER", beginX, vertSpacing * 1 - hudTextBuffer);
+	diagnostics.text("OXYGEN FLOW", beginX, vertSpacing * 2 - hudTextBuffer);
+	diagnostics.text("GRAVITY MODULATION", beginX, vertSpacing * 3 - hudTextBuffer);
+	diagnostics.text("PARTICLE SPLITTER", beginX, vertSpacing * 4 - hudTextBuffer);
 
 	// straight lines across for hyperdrive,o2,modulation
-	pgD.fill(sliderColor);
-	pgD.strokeWeight(sliderThick);
-	pgD.line(beginX, vertSpacing * 1, endX, vertSpacing * 1);
-	pgD.line(beginX, vertSpacing * 2, endX, vertSpacing * 2);
-	pgD.line(beginX, vertSpacing * 3, endX, vertSpacing * 3);
+	diagnostics.fill(sliderColor);
+	diagnostics.strokeWeight(sliderThick);
+	diagnostics.line(beginX, vertSpacing * 1, endX, vertSpacing * 1);
+	diagnostics.line(beginX, vertSpacing * 2, endX, vertSpacing * 2);
+	diagnostics.line(beginX, vertSpacing * 3, endX, vertSpacing * 3);
 
 	// targets for hyp, oxy, mod
-	pgD.noStroke();
-	pgD.rectMode(CENTER);
+	diagnostics.noStroke();
+	diagnostics.rectMode(CENTER);
 	for (int i = 0; i < 3; i++) {
 		// if pilot is close enough to correct value, color change
 		if (abs((target[i] - actual[i])) / range < targetBuffer) {
-			pgD.fill(hudTargetColor);
+			diagnostics.fill(hudTargetColor);
 		} else {
-			pgD.fill(hudOffColor);
+			diagnostics.fill(hudOffColor);
 		}
-		pgD.rect(map(target[i], 0, range, beginX, endX), vertSpacing * (i + 1), targetWidth, targetHeight);
+		diagnostics.rect(map(target[i], 0, range, beginX, endX), vertSpacing * (i + 1), targetWidth, targetHeight);
 	}
 
 	// actuals
-	pgD.strokeWeight(sliderThick);
-	pgD.stroke(hudActualColor);
+	diagnostics.strokeWeight(sliderThick);
+	diagnostics.stroke(hudActualColor);
 	for (int i = 0; i < 3; i++) {
 		float x = map(actual[i], 0, range, beginX, endX);
-		pgD.line(x, vertSpacing * (i + 1) - targetHeight / 2, x, vertSpacing * (i + 1) + targetHeight / 2);
+		diagnostics.line(x, vertSpacing * (i + 1) - targetHeight / 2, x, vertSpacing * (i + 1) + targetHeight / 2);
 	}
 
 	// switch boxes
-	pgD.rectMode(CENTER);
+	diagnostics.rectMode(CENTER);
 	float y = vertSpacing * 4;
 	for (int i = 0; i < 3; i++) {
 		float x = beginX + (i * hudSwitchSpacing);
 
-		pgD.stroke(hudFontColor);
-		pgD.strokeWeight(sliderThick);
-		pgD.noFill();
-		pgD.rect(x + hudSwitchSize / 2, y, hudSwitchSize, hudSwitchSize);
+		diagnostics.stroke(hudFontColor);
+		diagnostics.strokeWeight(sliderThick);
+		diagnostics.noFill();
+		diagnostics.rect(x + hudSwitchSize / 2, y, hudSwitchSize, hudSwitchSize);
 
 		// draw actual
 		if (actualSwitches.charAt(i) == '1' ) {
-			pgD.fill(hudSwitchFill);
-			pgD.noStroke();
-			pgD.rect(x + hudSwitchSize / 2, y, hudSwitchSize / 2, hudSwitchSize / 2);
+			diagnostics.fill(hudSwitchFill);
+			diagnostics.noStroke();
+			diagnostics.rect(x + hudSwitchSize / 2, y, hudSwitchSize / 2, hudSwitchSize / 2);
 		}
 
 		// draw positive/negative feedback for switch correctness
-		pgD.textAlign(LEFT);
+		diagnostics.textAlign(LEFT);
 		if (actualSwitches.charAt(i) == targetSwitches.charAt(i)) {
 			// yep
-			pgD.fill(0, 255, 0);
-			pgD.text("Ok", x + hudSwitchSize * 1.5, y + hudFontSize / 4);
+			diagnostics.fill(0, 255, 0);
+			diagnostics.text("Ok", x + hudSwitchSize * 1.5, y + hudFontSize / 4);
 		} else {
-			pgD.fill(255, 0, 0);
-			pgD.text("Error!", x + hudSwitchSize * 1.5, y + hudFontSize / 4);
+			diagnostics.fill(255, 0, 0);
+			diagnostics.text("Error!", x + hudSwitchSize * 1.5, y + hudFontSize / 4);
 		}
 	}
 
-	pgD.endDraw();
+	diagnostics.endDraw();
 
 	// send affirmatives
 	for (int i = 0; i < 4; i++) {
@@ -130,7 +129,6 @@ void gearTest() {
 						OscMessage m = new OscMessage("/pilot/affirmative");
 						m.add(i);
 						oscP5.send(m, PETER);
-						oscP5.send(m, BASE);
 						println("affirmative switch");
 					}
 				}
@@ -142,7 +140,6 @@ void gearTest() {
 						OscMessage m = new OscMessage("/pilot/affirmative");
 						m.add(i);
 						oscP5.send(m, PETER);
-						oscP5.send(m, BASE);
 						println("affirmative analog/ " + millis());
 					}
 				}
@@ -169,61 +166,61 @@ void gearTest() {
 }
 
 void drawHP(boolean doErase) {
-	pgD.beginDraw();
+	diagnostics.beginDraw();
 
-	pgD.strokeWeight(sliderThick);
+	diagnostics.strokeWeight(sliderThick);
 	
 	if (doErase)
-		pgD.background(0);
-	pgD.textFont(fontGUI, hudFontSize * 2);
-	pgD.textAlign(CENTER);
-	pgD.fill(255, 0, 0);
+		diagnostics.background(0);
+	diagnostics.textFont(font_small, font_small_size);
+	diagnostics.textAlign(CENTER);
+	diagnostics.fill(255, 0, 0);
 	// nfs(life / startingLife * 100, 1, 2) draws two decimals
-	pgD.text("HULL STRENGTH: " + int(life / startingLife * 100) + "%", width / 2 + 2, height - 50 + 2);
-	pgD.fill(255);
-	pgD.text("HULL STRENGTH: " + int(life / startingLife * 100) + "%", width / 2, height - 50);
+	diagnostics.text("HULL STRENGTH: " + int(life / startingLife * 100) + "%", width / 2 + 2, height - 50 + 2);
+	diagnostics.fill(255);
+	diagnostics.text("HULL STRENGTH: " + int(life / startingLife * 100) + "%", width / 2, height - 50);
 
 	// draw timeline thing
 	if (scene == 5) {
-		pgD.stroke(180);
-		pgD.line(100, 50, width - 100, 50);
+		diagnostics.stroke(180);
+		diagnostics.line(100, 50, width - 100, 50);
 		float shipX = map(timeInWormhole, 0, wormholeDuration, 100, width - 100);
-		pgD.stroke(255, 255, 0);
-		pgD.line(shipX, 40, shipX, 60);
+		diagnostics.stroke(255, 255, 0);
+		diagnostics.line(shipX, 40, shipX, 60);
 	}
 
 	// write affirmative messages to screen here
-	pgD.textFont(fontGUI, hudFontSize * 2);
-	pgD.textAlign(CENTER);
-	pgD.rectMode(CENTER);
-	pgD.stroke(255);
+	diagnostics.textFont(font_small, font_small_size);
+	diagnostics.textAlign(CENTER);
+	diagnostics.rectMode(CENTER);
+	diagnostics.stroke(255);
 	if (affirm[0] && millis() - affirmTimer[0] < affirmDuration) {
 		// hyperdrive good
-		pgD.fill(0);
-		pgD.rect(width / 2, height / 5 - hudFontSize / 2, width / 2, hudFontSize * 2);
-		pgD.fill(255, 255, 0);
-		pgD.text("HYPERDRIVE - OK!", width / 2, height / 5);
+		diagnostics.fill(0);
+		diagnostics.rect(width / 2, height / 5 - hudFontSize / 2, width / 2, hudFontSize * 2);
+		diagnostics.fill(255, 255, 0);
+		diagnostics.text("HYPERDRIVE - OK!", width / 2, height / 5);
 	}
 	if (affirm[1] && millis() - affirmTimer[1] < affirmDuration) {
 		// oxygen good
-		pgD.fill(0);
-		pgD.rect(width / 2, height / 5 * 2 - hudFontSize / 2, width / 2, hudFontSize * 2);
-		pgD.fill(255, 255, 0);
-		pgD.text("OXYGEN - OK!", width / 2, height / 5 * 2);
+		diagnostics.fill(0);
+		diagnostics.rect(width / 2, height / 5 * 2 - hudFontSize / 2, width / 2, hudFontSize * 2);
+		diagnostics.fill(255, 255, 0);
+		diagnostics.text("OXYGEN - OK!", width / 2, height / 5 * 2);
 	}
 	if (affirm[2] && millis() - affirmTimer[2] < affirmDuration) {
 		// modulation good
-		pgD.fill(0);
-		pgD.rect(width / 2, height / 5 * 3 - hudFontSize / 2, width / 2, hudFontSize * 2);
-		pgD.fill(255, 255, 0);
-		pgD.text("MODULATION - OK!", width / 2, height / 5 * 3);
+		diagnostics.fill(0);
+		diagnostics.rect(width / 2, height / 5 * 3 - hudFontSize / 2, width / 2, hudFontSize * 2);
+		diagnostics.fill(255, 255, 0);
+		diagnostics.text("MODULATION - OK!", width / 2, height / 5 * 3);
 	}
 	if (affirm[3] && millis() - affirmTimer[3] < affirmDuration) {
 		// particle good
-		pgD.fill(0);
-		pgD.rect(width / 2, height / 5 * 4 - hudFontSize / 2, width / 2, hudFontSize * 2);
-		pgD.fill(255, 255, 0);
-		pgD.text("P. SPLITTER - OK!", width / 2, height / 5 * 4);
+		diagnostics.fill(0);
+		diagnostics.rect(width / 2, height / 5 * 4 - hudFontSize / 2, width / 2, hudFontSize * 2);
+		diagnostics.fill(255, 255, 0);
+		diagnostics.text("P. SPLITTER - OK!", width / 2, height / 5 * 4);
 	}
-	pgD.endDraw();
+	diagnostics.endDraw();
 }

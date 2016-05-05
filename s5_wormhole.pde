@@ -1,10 +1,10 @@
 // think of it as 3 sliders, with target values and then actual values
 // the goal is to get the actual to the target by adjusting sensors etc.
-float range = 100;	// 0 - 9 range
+float range = 100;	//
 float[] target = {range / 2, range / 2, range / 2};	// where value should be
 float[] actual = {range / 2, range / 2, range / 2};	// where value is
 // now we also have flip switches
-String targetSwitches = "000";
+String targetSwitches = "010";
 String actualSwitches = "000";
 int switchWeight = 5;	// how much damage does one off digit do?
 
@@ -36,12 +36,30 @@ boolean[] affirm = {false, false, false, false};
 long[] affirmTimer = {0, 0, 0, 0};
 int affirmDuration = 1000;
 
+
+// ------ wave properties ------
+int waveCount = 0;
+int pointCount = 28; // 32
+float whDiameter = 120;
+float phaseOffset, newPhaseOffset;
+float ringRate = 80;  //ms birthrate  was 20
+int minRingRate = 20;  //20
+int maxRingRate = 80; //120
+float waveSpeed = 800;
+float minWaveSpeed = 100;
+float maxWaveSpeed = 1200;
+int maxWaves = 800;
+float rotateMult = .0025; // how fast shit spins
+long lastRing;
+
+
 void wormhole() {
 
-	// this seems to get used a lot, so...
+	// ------ timer ------
 	timeInWormhole = millis() - startedWormhole;
 
-	// go through OSC message stack
+
+	// ------ OSC ------
 	isBusy = true;
 	synchronized (oscStack) {
 		for (OscMessage o : oscStack) {
@@ -53,81 +71,144 @@ void wormhole() {
 	}
 	isBusy = false;
 
-	// add streaks
-	for (int i = 0; i < 2; i++) {
-		streaks.add(new Asteroid(0));
-	}
 
-	// remove old streaks
-	for (int i = streaks.size() - 1; i >= 0; i--) {
-		Asteroid a = streaks.get(i);
-		if (a.dead()) {
-			streaks.remove(i);
+	// ------ WORMHOLE! -----
+
+	// spawn new ring of points every so often
+	if (currTime - lastRing > ringRate && waves.size() < maxWaves) {
+		lastRing = currTime;
+
+		waves.add(new Wave(far));
+		waveCount++;
+
+		//whDiameter = 120 + noise(waveCount) * 60;
+
+		//whDiameter = random(80, 140);
+
+		// set offset
+		if (phaseOffset == 0) {
+			phaseOffset = TWO_PI / pointCount / 2;
+		} else {
+			phaseOffset = 0;
 		}
 	}
 
-	// destroy any asteroids that are offscreen
-	synchronized (asteroids) {
-		for (int i = asteroids.size() - 1; i >= 0; i--) {
-			Asteroid a = asteroids.get(i);
-			if (a.dead()) {
-				asteroids.remove(i);
+	// remove any waves that have gone offscreen
+	for (int i = waves.size() - 1; i >= 0; i--) {
+		Wave w = waves.get(i);
+		if (w.z > near) {
+			waves.remove(i);
+		}
+	}
+
+	// spawn new particles (testing)
+	for (int i = 0; i < 5; i++) {
+		particles.add(new Particle());
+	}
+
+	// remove any stray particles
+		for (int i = particles.size() - 1; i >= 0; i--) {
+		Particle p = particles.get(i);
+		if (p.z > near) {
+			particles.remove(i);
+		}
+	}
+
+	// update partciles
+	for (Particle p : particles) {
+		p.update();
+	}
+
+
+	pilot.beginDraw();
+	pilot.background(bgColor);
+
+	// update and display
+	for (Wave wave : waves) {
+		wave.update();
+		//wave.display();	// just for diagnostic
+	}
+
+
+
+	// ------ draw triangles ------
+
+	pilot.noStroke();
+	colorMode(HSB, 255);
+	// draw triangles
+	for (int iw = 0; iw < waves.size(); iw++) {
+		if (iw + 1 < waves.size()) {
+			Wave w1 = waves.get(iw);
+			Wave w2 = waves.get(iw + 1);
+
+			for (int i = 0; i < pointCount; i++) {
+				float op = map(w1.z, far, near, 0, 255);
+				pilot.pushMatrix();
+				//pilot.stroke(255, op / 7);
+
+				pilot.beginShape(TRIANGLES);
+				pilot.fill(w1.c[i], op);
+				pilot.vertex(w1.x[i], w1.y[i], w1.z);
+				pilot.fill(w2.c[i], op);
+				pilot.vertex(w2.x[i], w2.y[i], w2.z);
+
+				int ii = i;
+				if (!w1.turned) {
+					ii = (i + 1) % pointCount;
+				} else {
+					// get around negative modulo problem...
+					ii = (i - 1) % pointCount;
+					if (i == 0) ii = pointCount - 1;
+				}
+				//pilot.fill(w2.c[ii], op);
+				pilot.vertex(w2.x[ii], w2.y[ii], w2.z);
+				pilot.endShape();
+
+				// draw inverse (sorta) triangle to fill in gap
+				pilot.beginShape(TRIANGLES);
+				//pilot.fill(w1.c[i], op);
+				pilot.vertex(w1.x[i], w1.y[i], w1.z);
+				//pilot.fill(w1.c[(i+1) % pointCount], op);
+				pilot.vertex(w1.x[(i + 1) % pointCount], w1.y[(i + 1) % pointCount], w1.z);
+
+				ii = i;
+				if (!w1.turned) {
+					ii = (i + 1) % pointCount;
+				} else {
+				}
+				//pilot.fill(w2.c[ii], op);
+				pilot.vertex(w2.x[ii], w2.y[ii], w2.z);
+
+				pilot.endShape();
+				pilot.popMatrix();
 			}
 		}
 	}
 
-	// remove old stars from previous scene gradually
-	if (timeInWormhole > 1000 && stars.size() > 0) {
-		if (random(1) > .7) {
-			int rando = int(random(stars.size()));
-			stars.remove(rando);
-		}
-	}
 
-	// vars for end of wormhole
-	float timeInWormholeSq = pow(timeInWormhole, 2);
-	float durSq = pow(wormholeDuration, 2);
+	// ------ light at the end of the tunnel ------
+	// float timeInWormholeSq = pow(timeInWormhole, 2);
+	// float durSq = pow(wormholeDuration, 2);
 
-	pg.beginDraw();
+	// if (wormholeDuration - timeInWormhole > wormholeDuration * .3) {
+	// 	pilot.noFill();
+	// } else {
+	// 	// last 30% of wormhole time, bright white light!
+	// 	pilot.fill(map(timeInWormholeSq, durSq * .7, durSq, 0, 22));
+	// }
 
-	pg.background(bgColor);
+	// pilot.strokeWeight(map(timeInWormholeSq, 0, durSq, .5, 30));
+	// pilot.stroke(100, 100, 255, 90);
+	// pilot.pushMatrix();
+	// pilot.translate(width / 2, height / 2, far);
 
-	// render stars
-	for (Star s : stars) {
-		s.display();
-	}
+	// float temp = map(timeInWormholeSq, 0, durSq, 0, 3200);
+	// pilot.ellipse(0, 0, temp, temp);
+	// pilot.popMatrix();
 
-	// render streaks
-	for (Asteroid a : streaks) {
-		a.update();
-		a.display();
-	}
 
-	if (wormholeDuration - timeInWormhole > wormholeDuration * .3) {
-		pg.noFill();
-	} else {
-		// last 30% of wormhole time, bright white light!
-		pg.fill(map(timeInWormholeSq, durSq * .7, durSq, 0, 22));
-	}
 
-	pg.strokeWeight(map(timeInWormholeSq, 0, durSq, .5, 30));
-	pg.stroke(100, 100, 255, 90);
-	pg.pushMatrix();
-	pg.translate(width / 2, height / 2, far);
-
-	float temp = map(timeInWormholeSq, 0, durSq, 0, 3200);
-	pg.ellipse(0, 0, temp, temp);
-	pg.popMatrix();
-
-	// update, display asteroids
-	//synchronized (asteroids) {
-	for (Asteroid a : asteroids) {
-		a.update();
-		a.display();
-	}
-	//}
-
-	pg.endDraw();
+	pilot.endDraw();
 
 	// and if we're REALLY CLOSE to the end
 	if (wormholeDuration - timeInWormhole < wormholeDuration * .05) {
@@ -168,7 +249,6 @@ void wormhole() {
 								OscMessage m = new OscMessage("/pilot/affirmative");
 								m.add(i);
 								oscP5.send(m, PETER);
-								oscP5.send(m, BASE);
 							}
 						}
 					}
@@ -194,12 +274,9 @@ void wormhole() {
 								OscMessage m = new OscMessage("/pilot/affirmative");
 								m.add(i);
 								oscP5.send(m, PETER);
-								oscP5.send(m, BASE);
 							}
 						}
 					}
-
-
 				}
 			}
 			// give a second buffer between fixing a problem and it
@@ -261,9 +338,9 @@ void unPackOsc(OscMessage o) {
 	// rhythm and melody come in 0-3 so add 4 if its melody
 	if (o.addrPattern().equals("/peter/melody")) i += 4;
 
-	if (asteroids.size() < maxAsteroids) {
-		synchronized (asteroids) {
-			asteroids.add(new Asteroid(i + 1));
-		}
-	}
+	// if (asteroids.size() < maxAsteroids) {
+	// 	synchronized (asteroids) {
+	// 		asteroids.add(new Asteroid(i + 1));
+	// 	}
+	// }
 }

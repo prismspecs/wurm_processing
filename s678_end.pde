@@ -6,10 +6,10 @@ void victory() {
 		scene = 0;
 	}
 
-	pg.beginDraw();
-	pg.background(0, 255);
+	pilot.beginDraw();
+	pilot.background(0, 255);
 	doText("YOU SURVIVED THE WORMHOLE\nAND MADE IT TO\nTHE OTHER SIDE", textColor);
-	pg.endDraw();
+	pilot.endDraw();
 }
 
 void defeat() {
@@ -18,10 +18,10 @@ void defeat() {
 		scene = 0;
 	}
 
-	pg.beginDraw();
-	pg.background(0, 255);
+	pilot.beginDraw();
+	pilot.background(0, 255);
 	doText("YOUR WURM WAS DESTROYED\n(AND SO WERE YOU)", textColor);
-	pg.endDraw();
+	pilot.endDraw();
 }
 
 // ka-boom
@@ -30,8 +30,8 @@ void selfDestruct() {
 		scene = 0;
 	}
 
-	pg.beginDraw();
-	pg.background(0, 255);
+	pilot.beginDraw();
+	pilot.background(0, 255);
 	doText("YOU BLEW YOURSELF UP\nFOR SOME REASON", textColor);
-	pg.endDraw();
+	pilot.endDraw();
 }

@@ -62,7 +62,6 @@ void sendAll() {
 	m.add((approachingEnd) ? 1 : 0);	// 1 or zero true/false
 	// to everyone, because why not
 	oscP5.send(m, PETER);
-	oscP5.send(m, BASE);
 	if (scene == 5)
 		oscP5.send(m, VDMX);
 }
