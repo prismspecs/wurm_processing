@@ -12,11 +12,6 @@ class Houston {
 	float statsAreaX, statsAreaY;
 	float statsAreaW, statsAreaH;
 
-	// ------ camera ------
-	Capture cam;
-	float camW, camH;
-	float camRatio = 1.33;	// width / height for camera
-
 	// ------ sliders ------
 	// 0: hyperdrive
 	// 1: oxygen
@@ -99,11 +94,6 @@ class Houston {
 		patcherDiameter = cellW / 2;
 		patcherSpacing = (patcherAreaH / 4) + (patcherDiameter / 4);
 
-		// webcam
-		String[] cameras = Capture.list();
-		println(cameras);
-		cam = new Capture(pApp, cameras[0]);
-		cam.start();
 
 		// resized to...
 		camH = HOUSTON_H / 2;
@@ -111,9 +101,6 @@ class Houston {
 	}
 
 	void update() {
-		if (cam.available() == true) {
-			cam.read();
-		}
 
 		// ------ patch bay ------
 		// ERROR EVENT on patcher means select a new pair
@@ -149,6 +136,7 @@ class Houston {
 		pg.beginDraw();
 		pg.background(127);
 		//pg.image(cam, 0, HOUSTON_H - camH, camW, camH);
+		if(cam != null)
 		pg.image(cam, 0, 0, HOUSTON_W, HOUSTON_H);
 
 		// show pilot stats

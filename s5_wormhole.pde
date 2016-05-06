@@ -102,12 +102,14 @@ void wormhole() {
 	}
 
 	// spawn new particles (testing)
-	for (int i = 0; i < 5; i++) {
-		particles.add(new Particle());
+	for (int i = 0; i < 1; i++) {
+		//particles.add(new Particle(int(random(3))));
+		if(random(1) > .7)
+		particles.add(new Particle(2));
 	}
 
 	// remove any stray particles
-		for (int i = particles.size() - 1; i >= 0; i--) {
+	for (int i = particles.size() - 1; i >= 0; i--) {
 		Particle p = particles.get(i);
 		if (p.z > near) {
 			particles.remove(i);
@@ -117,11 +119,8 @@ void wormhole() {
 	// update partciles
 	for (Particle p : particles) {
 		p.update();
+		//p.display();
 	}
-
-
-	pilot.beginDraw();
-	pilot.background(bgColor);
 
 	// update and display
 	for (Wave wave : waves) {
@@ -130,11 +129,14 @@ void wormhole() {
 	}
 
 
+	pilot.beginDraw();
+	pilot.background(bgColor);
+
 
 	// ------ draw triangles ------
 
 	pilot.noStroke();
-	colorMode(HSB, 255);
+	//colorMode(HSB, 255);
 	// draw triangles
 	for (int iw = 0; iw < waves.size(); iw++) {
 		if (iw + 1 < waves.size()) {
@@ -147,9 +149,11 @@ void wormhole() {
 				//pilot.stroke(255, op / 7);
 
 				pilot.beginShape(TRIANGLES);
-				pilot.fill(w1.c[i], op);
+				//pilot.fill(w1.c[i], op);
+				pilot.fill(w1.col[i], op);
 				pilot.vertex(w1.x[i], w1.y[i], w1.z);
-				pilot.fill(w2.c[i], op);
+				//pilot.fill(w2.c[i], op);
+				pilot.fill(w2.col[i], op);
 				pilot.vertex(w2.x[i], w2.y[i], w2.z);
 
 				int ii = i;
@@ -185,6 +189,10 @@ void wormhole() {
 		}
 	}
 
+	// draw particles
+	for (Particle p : particles) {
+		p.display();
+	}
 
 	// ------ light at the end of the tunnel ------
 	// float timeInWormholeSq = pow(timeInWormhole, 2);

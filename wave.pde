@@ -33,6 +33,7 @@ class Wave {
 
       // now with color!
       //col[i] = color(noise(cos(p[i]), sin(p[i])) * 255, random(100, 255), abs(tan(p[i])) * 255);
+      col[i] = color(random(255));
 
       //pointOffset[i] = random(-2, 2);
     }

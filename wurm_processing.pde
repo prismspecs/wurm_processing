@@ -22,6 +22,13 @@ String PETER_IP = "169.254.128.132";
 String VDMX_IP = "127.0.0.1"; // (localhost)
 
 
+// ------ camera ------
+Capture cam;
+float camW, camH;
+float camRatio = 1.33;  // width / height for camera
+boolean camInitiated = false;
+
+
 // universal stuff
 long lastTime = 0;  // last time millis was queried
 int lastScene = 0;  // to detect scene changes
@@ -59,7 +66,7 @@ float font_large_size, font_small_size;
 
 void settings() {
   size(PILOT_W, PILOT_H, P3D);
-  PJOGL.profile=1;  // syphon friendly ^^
+  PJOGL.profile = 1; // syphon friendly ^^
 }
 
 void setup() {
@@ -76,6 +83,7 @@ void setup() {
 
   // houston
   houston = new Houston(this);
+  thread("initCamera");
 
   // set up fonts
   font_large = loadFont("font100.vlw");
@@ -109,6 +117,13 @@ void setup() {
   resetVDMX();
   setupHUD(); // setup HUD display once at start
 
+}
+
+// separate thread otherwise crashes
+void initCamera() {
+  printArray(Capture.list());
+  cam = new Capture(this, Capture.list()[3]);
+  cam.start();
 }
 
 void draw() {
@@ -162,6 +177,9 @@ void draw() {
   // houston
   houston.update();
   houston.display();
+  if (cam != null && cam.available() == true) {
+    cam.read();
+  }
 
   // render game to screen (or syphon)
   if (!SYPHON) {
